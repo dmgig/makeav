@@ -2,20 +2,34 @@ const menus = {
   main: `
     makeav [command] <options>
 
+    resize ............. resize images
     slide .............. create a slide show
     static ............. create a show with a static image
     version ............ show package version
     help ............... show help menu for a command`,
 
+  resize: `
+    makeav resize`,
+
   slide: `
     makeav slide <options>
 
-    --location, -l ..... the location to use`,
+    --orderid, -o ....... (string) order id, directory name [required]
+    --audiofile, -a ..... (string) audio filename [required]
+    --duration, -d ...... (int) slide duration, defaults to 8
+    --waveviz, -w ....... (web color) wave visual, if false will not appear
+    --logo, -l .......... (string) logo image file
+    --outname, -o ....... (string) output name`,
 
   static: `
     makeav slide <options>
 
-    --location, -l ..... the location to use`,
+    --orderid, -o ....... (string) order id, directory name [required]
+    --audiofile, -a ..... (string) audio filename [required]
+    --waveviz, -w ....... (web color) wave visual, if false will not appear
+    --logo, -l .......... (string) logo image file
+    --mainimg, -m ....... (string) main image file
+    --outname, -o ....... (string) output name`,
 }
 
 module.exports = (args) => {

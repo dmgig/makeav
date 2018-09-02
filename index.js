@@ -14,6 +14,12 @@ module.exports = () => {
   }
 
   switch (cmd) {
+    case 'config':
+      require('./cmds/config')(args)
+      break
+    case 'resize':
+      require('./cmds/resize')(args)
+      break
     case 'slide':
       require('./cmds/slide')(args)
       break

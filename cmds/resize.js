@@ -3,7 +3,7 @@ const error = require('../utils/error')
 const Configstore = require('configstore')
 const conf = new Configstore('makeav')
 const ffmpeg = require('../utils/ffmpeg')
-const fs = require('fs');
+const fs = require('fs')
 
 module.exports = async (args) => {
 

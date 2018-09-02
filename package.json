@@ -25,6 +25,7 @@
     "ffmpeg": "0.0.4",
     "fluent-ffmpeg": "^2.1.2",
     "inquirer": "^6.2.0",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "moment": "^2.22.2"
   }
 }

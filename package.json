@@ -1,0 +1,23 @@
+{
+  "name": "makeav",
+  "version": "1.0.0",
+  "description": "Create videos from images and audio files",
+  "main": "index.js",
+  "bin": {
+    "makeav": "bin/makeav"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ffmpeg",
+    "video",
+    "audio"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "preferGlobal": true,
+  "author": "Dave M. Giglio",
+  "license": "ISC"
+}

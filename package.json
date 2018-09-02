@@ -19,5 +19,12 @@
   },
   "preferGlobal": true,
   "author": "Dave M. Giglio",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "configstore": "^4.0.0",
+    "ffmpeg": "0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "inquirer": "^6.2.0",
+    "minimist": "^1.2.0"
+  }
 }

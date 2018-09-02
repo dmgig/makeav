@@ -7,8 +7,8 @@ module.exports = async (args) => {
   try {
     const run = async () => {
       const configVals = await inquirer.mainConfig();
-      conf.set('working_dir', `./${configVals.working_dir}`)
-      conf.set('output_dir', `./${configVals.output_dir}`)
+      conf.set('working_dir', `${process.cwd()}/${configVals.working_dir}`)
+      conf.set('output_dir', `${process.cwd()}/${configVals.output_dir}`)
     }
     run();
   } catch (err) {

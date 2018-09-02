@@ -15,20 +15,17 @@ module.exports = async (args) => {
     const waveviz = args.waveviz || args.w || false
     const duration = args.duration || args.d || 8
     const outname = `${(args.outname || args.o || orderid)}-${runtime}.mp4`
+    const outPath = `${conf.get('output_dir')}/${outname}`
     const logofile = args.logofile || args.l || 'makeav-logo.png'
     const workingPath = conf.get('working_dir')
     const orderPath = `${workingPath}/${orderid}`
     const resizedPath = `${orderPath}/resized`
     const imageFiles = await files.getListOfImageFiles(resizedPath)
 
-    console.log(imageFiles)
-
-    await ffmpeg.makeSlideShow(orderPath, resizedPath, duration, imageFiles)
-    await ffmpeg.makeSlideShowList(orderPath)
-    await ffmpeg.combineFinalSlideShow(orderPath, audiofile, outname, waveviz)
-    fs.unlink(`${orderPath}/makeav-slideshow.mp4`)
-
     console.log(`Working on order: ${orderid}`)
+    console.log(process.cwd())
+
+    await ffmpeg.createSlideShow(orderPath, resizedPath, audiofile, duration, imageFiles, logofile, waveviz, outPath)
 
   } catch (err) {
     error(err)

@@ -18,7 +18,7 @@ module.exports = async (args) => {
     console.log(imageFiles)
     imageFiles.forEach((el, i) => {
       console.log(`${orderpath}/${el}`)
-      ffmpeg.resizeImage(i, `${orderpath}/${el}`, resizedpath)
+      ffmpeg.resizeImage(i, `${orderpath}/${el}`, resizedpath, false, () => {})
     })
 
   } catch (err) {

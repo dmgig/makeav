@@ -199,13 +199,13 @@ module.exports = {
   },
 
   finalizeStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, waveviz, outPath, callback) => {
-    const logoResizedPath = `${orderPath}/${C.logoFilename}`
+    const logoPath = `${orderPath}/${logoFile}`
     const staticResizedPath = `${resizedPath}/${C.staticFilename}`
     const audioPath = `${orderPath}/${audiofile}`
 
     const ffCmd = ffmpeg();
 
-    ffCmd.addInput(`${logoResizedPath}`).loop()
+    ffCmd.addInput(`${logoPath}`).loop()
     ffCmd.addInput(`${staticResizedPath}`).loop()
     ffCmd.addInput(audioPath)
 

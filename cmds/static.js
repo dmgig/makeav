@@ -23,10 +23,10 @@ module.exports = async (args) => {
     const resizedPath = `${orderPath}/${C.workingDir}`
     const imageFiles = await files.getListOfImageFiles(resizedPath)
 
-    if(!orderid) error('ERROR: Order Id Required.')
-    if(!audiofile) error('ERROR: Audiofile Required.')
-    if(!logoFile) error('ERROR: Logo Image Required.')
-    if(!staticFile) error('ERROR: Static Image Required.')
+    if(!orderid) error('ERROR: Order Id Required.', true)
+    if(!audiofile) error('ERROR: Audiofile Required.', true)
+    if(!logoFile) error('ERROR: Logo Image Required.', true)
+    if(!staticFile) error('ERROR: Static Image Required.', true)
 
     await ffmpeg.createStaticShow(orderPath, resizedPath, audiofile, logoFile, staticFile, waveviz, outPath)
 

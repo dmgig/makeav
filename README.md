@@ -2,6 +2,10 @@
 
 ## Slideshow creator with ffmpeg
 
+#### Dependencies
+
+Must have ffmpeg installed
+
 #### Install
 
 ```bash
@@ -17,14 +21,22 @@ Create a folder where you'll want to save your working files and your output vid
 
 ```bash
 makeav init
-makeav help
 ```
 
-Add a new folder to the working directory containing your images, logo, and audio files.
+Initializing will create your working directory for your working files, and an output directory for the video output.
+
+Add a new directory to the working directory containing your images, logo, and audio files.
+
+- Images can be of any size and format, will be resized to fit the video frame
+- Logo should be 960x640 png with transparency
+- Audio can be of any format
 
 This directory's name is your order id.
 
 ```bash
+# help
+makeav help
+
 #static show
 makeav static -o=test -a=output.wav -l=logo.png -s=e.png
 

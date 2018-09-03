@@ -1,4 +1,6 @@
 module.exports = {
+  ordersDirname: 'working',
+  outputDirname: 'output',
   durationDefault: 8,
   workingDir: 'makeav',
   logoFilename: 'makeav-logo.png',

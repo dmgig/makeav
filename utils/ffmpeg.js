@@ -1,19 +1,15 @@
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
-const async = require("async");
-const path = require("path");
-const C = require("../constants");
+const async = require("async")
+const path = require("path")
+const Configstore = require('configstore')
+const conf = new Configstore('makeav')
+const files = require("../utils/files")
+const C = require("../constants")
 
 module.exports = {
 
-  resizeImage: (i, inPath, resizedir, outname, callback) => {
-    let id, outPath
-    if(outname){
-      outPath = `${resizedir}/${outname}`
-    }else{
-      id = i + 1;
-      outPath = `${resizedir}/${C.imgPrefix}-${id.toString().padStart(3, '0')}.png`
-    }
+  resizeImage: (inPath, outPath, callback) => {
     ffmpeg(inPath)
       .videoFilter("format=rgba")
       .videoFilter('scale=iw*min(960/iw\\,480/ih):ih*min(960/iw\\,480/ih)')
@@ -25,35 +21,61 @@ module.exports = {
         console.log('Error: ' + err.message);
       })
       .on('end', function() {
-        callback(null, true)
+        return callback(null, true)
         console.log('Resizing image finished!');
       })
       .save(outPath)
   },
 
-  createSlideShow: (orderPath, resizedPath, audiofile, duration, imageFiles, logofile, waveviz, outPath) => {
-    async.series([
-      function(callback) {
-        console.log(1)
-        module.exports.makeSlideShow(orderPath, resizedPath, duration, imageFiles, callback)
-      },
-      function(callback) {
-        console.log(2)
-        module.exports.makeSlideShowList(orderPath, callback)
-      },
-      function(callback) {
-        console.log(3)
-        module.exports.combineFinalSlideShow(orderPath, resizedPath, audiofile, duration, imageFiles, logofile, waveviz, outPath, callback)
-      }
-    ],
-    // optional callback
-    function(err, results) {
-      console.log(results)
-      // results is now equal to ['one', 'two']
+  createSlideShow: (orderPath, resizedPath, audiofile, duration, logoFile, waveviz, outPath) => {
+    const logoPath = `${orderPath}/${logoFile}`
+    let resizedImages
+    try{
+      fs.mkdirSync(resizedPath)
+    }catch(err){}
+
+    const promise = files.getListOfImageFiles(orderPath)
+    promise.then(function(imageFiles){
+      async.series([
+        function(callback) {
+          for(let i in imageFiles){
+            if(imageFiles[i] === logoFile) continue
+            const id = parseInt(i) + 1
+            const outPath = `${resizedPath}/${C.imgPrefix}-${id.toString().padStart(3, '0')}.png`
+            if(imageFiles.length === parseInt(i) + 2) {
+              module.exports.resizeImage(`${orderPath}/${imageFiles[i]}`, outPath, callback)
+            } else {
+              module.exports.resizeImage(`${orderPath}/${imageFiles[i]}`, outPath, () => {})
+            }
+          }
+        },
+        function(callback) {
+
+          const promise = files.getListOfImageFiles(resizedPath)
+          promise.then(function(images){
+            resizedImages = images
+            callback(null, 1)
+          });
+        },
+        function(callback) {
+          module.exports.makeSlideShow(orderPath, resizedPath, logoFile, duration, resizedImages, callback)
+        },
+        function(callback) {
+          module.exports.makeSlideShowList(orderPath, resizedPath, callback)
+        },
+        function(callback) {
+          module.exports.combineFinalSlideShow(orderPath, resizedPath, audiofile, duration, resizedImages, logoFile, waveviz, outPath, callback)
+        }
+      ],
+      // optional callback
+      function(err, results) {
+        console.log(results)
+        // results is now equal to ['one', 'two']
+      });
     });
   },
 
-  makeSlideShow: (orderPath, resizedPath, duration, imageFiles, callback) => {
+  makeSlideShow: (orderPath, resizedPath, logoFile, duration, imageFiles, callback) => {
     console.log('makeSlideshow')
     const slideshow = `${resizedPath}/${C.slideshowFilename}.mp4`
     const ffCmd = ffmpeg();
@@ -81,10 +103,10 @@ module.exports = {
 
     // finalize
     ffCmd.on('start', function(commandLine) {
-      // console.log('Command: ' + commandLine);
+      console.log('Command: ' + commandLine);
     })
     .on('progress', function(progress) {
-      console.log(`Sildshow: ${progress.timemark}`);
+      console.log(`Sildeshow: ${progress.timemark}`);
     })
     .on('error', function(err) {
       console.log('Error: ' + err.message);
@@ -97,14 +119,14 @@ module.exports = {
 
   },
 
-  makeSlideShowList: (orderPath, callback) => {
+  makeSlideShowList: (orderPath, resizedPath, callback) => {
     console.log('makeSlideshowList')
-    const slidelist = `${orderPath}/${C.slidelistTxt}`
+    const slidelist = `${resizedPath}/${C.slidelistTxt}`
     let string = ''
     for(i=0; i<500; i++){
-      string = `${string}file 'resized/${C.slideshowFilename}.mp4'\n`
+      string = `${string}file '${C.slideshowFilename}.mp4'\n`
     }
-    let options = { 'encoding': 'utf8' }
+    let options = { 'encoding': 'utf8', 'mode': 0755 }
     fs.writeFile(slidelist, string, options, (err) => {
       if (err) throw err;
       console.log('slidelist written')
@@ -114,9 +136,9 @@ module.exports = {
 
   combineFinalSlideShow: (orderPath, resizedPath, audiofile, duration, imageFiles, logofile, waveviz, outPath, callback) => {
     console.log('combineFinalSlideshow')
-    const slidelist = `${orderPath}/${C.slidelistTxt}`
+    const slidelist = `${resizedPath}/${C.slidelistTxt}`
     const slideshow = `${resizedPath}/${C.slideshowFilename}.mp4`
-    const logoPath = `${resizedPath}/${logofile}`
+    const logoPath = `${orderPath}/${logofile}`
     const audioPath = `${orderPath}/${audiofile}`
     const ffCmd = ffmpeg();
     ffCmd.addInput(slidelist).inputOptions(['-f concat'])
@@ -143,7 +165,7 @@ module.exports = {
 
     // finalize
     ffCmd.on('start', function(commandLine) {
-      // console.log('Command: ' + commandLine);
+      console.log('Command: ' + commandLine);
     })
     .on('progress', function(progress) {
       console.log(`Video: ${progress.timemark}`);
@@ -164,16 +186,11 @@ module.exports = {
     const staticPath = `${orderPath}/${staticFile}`
     async.series([
       function(callback) {
-        console.log(1)
-        module.exports.resizeImage(0, logoPath, resizedPath, C.logoFilename, callback)
+        const outPath = `${resizedPath}/${C.staticFilename}`
+        module.exports.resizeImage(staticPath, outPath, callback)
       },
       function(callback) {
-        console.log(2)
-        module.exports.resizeImage(0, staticPath, resizedPath, C.staticFilename, callback)
-      },
-      function(callback) {
-        console.log(3)
-        module.exports.finalizeStaticShow(orderPath, resizedPath, audiofile, C.logoFilename, C.staticFilename, waveviz, outPath, callback)
+        module.exports.finalizeStaticShow(orderPath, resizedPath, audiofile, logoFile, C.staticFilename, waveviz, outPath, callback)
       }
     ],
     function(err, results) {
@@ -182,7 +199,7 @@ module.exports = {
   },
 
   finalizeStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, waveviz, outPath, callback) => {
-    const logoResizedPath = `${resizedPath}/${C.logoFilename}`
+    const logoResizedPath = `${orderPath}/${C.logoFilename}`
     const staticResizedPath = `${resizedPath}/${C.staticFilename}`
     const audioPath = `${orderPath}/${audiofile}`
 

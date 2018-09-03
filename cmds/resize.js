@@ -9,7 +9,7 @@ module.exports = async (args) => {
 
   try {
     const orderid = args.orderid || args.o
-    const orderpath = `${conf.get('working_dir')}/${orderid}`
+    const orderpath = `${conf.get('workingDirPath')}/${orderid}`
     const resizedpath = `${orderpath}/resized`
     const imageFiles = await files.getListOfImageFiles(orderpath)
     try{

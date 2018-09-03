@@ -13,20 +13,19 @@ module.exports = async (args) => {
     const runtime = moment().format('YYYYMMDDHHmmss');
     const orderid = args.orderid || args.o
     const audiofile = args.audiofile || args.a
-    const waveviz = args.waveviz || args.w || false
     const duration = args.duration || args.d || C.durationDefault
+    const waveviz = args.waveviz || args.w || false
+    const logofile = args.logo || args.l || C.logoFilename
     const outname = `${(args.outname || args.o || orderid)}-${runtime}.mp4`
     const outPath = `${conf.get('output_dir')}/${outname}`
-    const logofile = args.logofile || args.l || C.logoFilename
-    const workingPath = conf.get('working_dir')
+    const workingPath = conf.get('workingDirPath')
     const orderPath = `${workingPath}/${orderid}`
     const resizedPath = `${orderPath}/${C.workingDir}`
-    const imageFiles = await files.getListOfImageFiles(resizedPath)
 
     if(!orderid) error('ERROR: Order Id Required.')
     if(!audiofile) error('ERROR: Audiofile Required.')
 
-    await ffmpeg.createSlideShow(orderPath, resizedPath, audiofile, duration, imageFiles, logofile, waveviz, outPath)
+    await ffmpeg.createSlideShow(orderPath, resizedPath, audiofile, duration, logofile, waveviz, outPath)
 
   } catch (err) {
     error(err)

@@ -14,8 +14,8 @@ module.exports = () => {
   }
 
   switch (cmd) {
-    case 'config':
-      require('./cmds/config')(args)
+    case 'init':
+      require('./cmds/init')(args)
       break
     case 'resize':
       require('./cmds/resize')(args)

@@ -1,14 +1,15 @@
 const inquirer = require('inquirer');
+const C = require('../constants')
 
 module.exports = {
 
   mainConfig: () => {
     const questions = [
       {
-        name: 'working_dir',
+        name: 'workingDir',
         type: 'input',
         message: 'Enter working directory location (relative to current path):',
-        default: 'working',
+        default: C.ordersDirname,
         validate: function( value ) {
           if (value.length) {
             return true;
@@ -18,10 +19,10 @@ module.exports = {
         }
       },
       {
-        name: 'output_dir',
+        name: 'outputDir',
         type: 'input',
         message: 'Enter output directory location (relative to current path):',
-        default: 'output',
+        default: C.outputDirname,
         validate: function(value) {
           if (value.length) {
             return true;

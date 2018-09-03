@@ -2,11 +2,15 @@ const menus = {
   main: `
     makeav [command] <options>
 
+    init ............... create working, output directories
     resize ............. resize images
     slide .............. create a slide show
     static ............. create a show with a static image
     version ............ show package version
     help ............... show help menu for a command`,
+
+  init: `
+    makeav init`,
 
   resize: `
     makeav resize`,
@@ -28,7 +32,7 @@ const menus = {
     --audiofile, -a ..... (string) audio filename [required]
     --waveviz, -w ....... (web color) wave visual, if false will not appear
     --logo, -l .......... (string) logo image file
-    --mainimg, -m ....... (string) main image file
+    --static, -s ....... (string) main image file
     --outname, -o ....... (string) output name`,
 }
 

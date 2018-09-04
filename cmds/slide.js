@@ -17,7 +17,7 @@ module.exports = async (args) => {
     const waveviz = args.waveviz || args.w || false
     const logofile = args.logo || args.l || C.logoFilename
     const outname = `${(args.outname || args.o || orderid)}-${runtime}.mp4`
-    const outPath = `${conf.get('output_dir')}/${outname}`
+    const outPath = `${conf.get('outputDir')}/${outname}`
     const workingPath = conf.get('workingDirPath')
     const orderPath = `${workingPath}/${orderid}`
     const resizedPath = `${orderPath}/${C.workingDir}`

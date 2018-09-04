@@ -36,41 +36,46 @@ module.exports = {
 
     const promise = files.getListOfImageFiles(orderPath)
     promise.then(function(imageFiles){
-      async.series([
-        function(callback) {
-          for(let i in imageFiles){
-            if(imageFiles[i] === logoFile) continue
-            const id = parseInt(i) + 1
-            const outPath = `${resizedPath}/${C.imgPrefix}-${id.toString().padStart(3, '0')}.png`
-            if(imageFiles.length === parseInt(i) + 2) {
-              module.exports.resizeImage(`${orderPath}/${imageFiles[i]}`, outPath, callback)
-            } else {
-              module.exports.resizeImage(`${orderPath}/${imageFiles[i]}`, outPath, () => {})
-            }
-          }
-        },
-        function(callback) {
+      const TASKS = [];
+      let task;
 
-          const promise = files.getListOfImageFiles(resizedPath)
-          promise.then(function(images){
-            resizedImages = images
-            callback(null, 1)
-          });
-        },
-        function(callback) {
-          module.exports.makeSlideShow(orderPath, resizedPath, logoFile, duration, resizedImages, callback)
-        },
-        function(callback) {
-          module.exports.makeSlideShowList(orderPath, resizedPath, callback)
-        },
-        function(callback) {
-          module.exports.combineFinalSlideShow(orderPath, resizedPath, audiofile, duration, resizedImages, logoFile, waveviz, outPath, callback)
+      for(let i in imageFiles){
+        if(imageFiles[i] === logoFile) continue
+        task = function(callback){
+          const id = parseInt(i) + 1
+          const outPath = `${resizedPath}/${C.imgPrefix}-${id.toString().padStart(3, '0')}.png`
+          module.exports.resizeImage(`${orderPath}/${imageFiles[i]}`, outPath, callback)
         }
-      ],
-      // optional callback
+        TASKS.push(task)
+      }
+
+      task = function(callback) {
+        const promise = files.getListOfImageFiles(resizedPath)
+        promise.then(function(images){
+          resizedImages = images
+          callback(null, 1)
+        });
+      }
+      TASKS.push(task)
+
+      task = function(callback) {
+        module.exports.makeSlideShow(orderPath, resizedPath, logoFile, duration, resizedImages, callback)
+      }
+      TASKS.push(task)
+
+      task = function(callback) {
+        module.exports.makeSlideShowList(orderPath, resizedPath, callback)
+      }
+      TASKS.push(task)
+
+      task = function(callback) {
+        module.exports.combineFinalSlideShow(orderPath, resizedPath, audiofile, duration, resizedImages, logoFile, waveviz, outPath, callback)
+      }
+      TASKS.push(task)
+
+      async.series(TASKS,
       function(err, results) {
         console.log(results)
-        // results is now equal to ['one', 'two']
       });
     });
   },

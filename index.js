@@ -17,6 +17,9 @@ module.exports = () => {
     case 'init':
       require('./cmds/init')(args)
       break
+    case 'config':
+      require('./cmds/config')(args)
+      break
     case 'resize':
       require('./cmds/resize')(args)
       break

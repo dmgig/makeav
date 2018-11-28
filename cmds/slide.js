@@ -18,17 +18,18 @@ module.exports = async (args) => {
     const wavevizcolor = args.wavevizcolor || false
     const logofile = args.logo || args.l || C.logoFilename
     const outname = `${(args.outname || args.o || orderid)}-${runtime}.mp4`
-    const outPath = `${conf.get('outputDir')}/${outname}`
+    const outPath = `${conf.get('outputDirPath')}/${outname}`
     const workingPath = conf.get('workingDirPath')
     const orderPath = `${workingPath}/${orderid}`
-    const resizedPath = `${orderPath}/${C.workingDir}`
+    const slideshowPath = `${orderPath}/slideshow`
+    const resizedPath = `${orderPath}/${C.workFilesDir}`
 
     if(!orderid) error('ERROR: Order Id Required.')
     if(!audiofile) error('ERROR: Audiofile Required.')
 
     console.log('makeav conf', args)
 
-    await ffmpeg.createSlideShow(orderPath, resizedPath, audiofile, duration, logofile, wavevizcolor, wavevizmode, outPath)
+    await ffmpeg.createSlideShow(orderPath, resizedPath, slideshowPath, audiofile, duration, logofile, wavevizcolor, wavevizmode, outPath)
 
   } catch (err) {
     error(err)

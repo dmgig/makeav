@@ -16,12 +16,12 @@ module.exports = async (args) => {
     const wavevizmode = args.wavevizmode || 'line'
     const wavevizcolor = args.wavevizcolor || false
     const outname = `${(args.outname || args.o || orderid)}-${runtime}.mp4`
-    const outPath = `${conf.get('output_dir')}/${outname}`
+    const outPath = `${conf.get('outputDirPath')}/${outname}`
     const staticFile = args.static || args.s || false
     const logoFile = args.logo || args.l || C.logoFilename
     const workingPath = conf.get('workingDirPath')
     const orderPath = `${workingPath}/${orderid}`
-    const resizedPath = `${orderPath}/${C.workingDir}`
+    const resizedPath = `${orderPath}/${C.workFilesDir}`
     const imageFiles = await files.getListOfImageFiles(resizedPath)
 
     if(!orderid) error('ERROR: Order Id Required.', true)

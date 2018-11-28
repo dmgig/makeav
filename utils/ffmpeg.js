@@ -27,14 +27,14 @@ module.exports = {
       .save(outPath)
   },
 
-  createSlideShow: (orderPath, resizedPath, audiofile, duration, logoFile, wavevizcolor, wavevizmode, outPath) => {
+  createSlideShow: (orderPath, resizedPath, slideshowPath, audiofile, duration, logoFile, wavevizcolor, wavevizmode, outPath) => {
     const logoPath = `${orderPath}/${logoFile}`
     let resizedImages
     try{
       fs.mkdirSync(resizedPath)
     }catch(err){}
 
-    const promise = files.getListOfImageFiles(orderPath)
+    const promise = files.getListOfImageFiles(slideshowPath)
     promise.then(function(imageFiles){
       const TASKS = [];
       let task;
@@ -44,7 +44,7 @@ module.exports = {
         task = function(callback){
           const id = parseInt(i) + 1
           const outPath = `${resizedPath}/${C.imgPrefix}-${id.toString().padStart(3, '0')}.png`
-          module.exports.resizeImage(`${orderPath}/${imageFiles[i]}`, outPath, callback)
+          module.exports.resizeImage(`${slideshowPath}/${imageFiles[i]}`, outPath, callback)
         }
         TASKS.push(task)
       }

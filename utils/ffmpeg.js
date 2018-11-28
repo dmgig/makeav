@@ -27,7 +27,7 @@ module.exports = {
       .save(outPath)
   },
 
-  createSlideShow: (orderPath, resizedPath, audiofile, duration, logoFile, waveviz, outPath) => {
+  createSlideShow: (orderPath, resizedPath, audiofile, duration, logoFile, wavevizcolor, wavevizmode, outPath) => {
     const logoPath = `${orderPath}/${logoFile}`
     let resizedImages
     try{
@@ -69,7 +69,7 @@ module.exports = {
       TASKS.push(task)
 
       task = function(callback) {
-        module.exports.combineFinalSlideShow(orderPath, resizedPath, audiofile, duration, resizedImages, logoFile, waveviz, outPath, callback)
+        module.exports.combineFinalSlideShow(orderPath, resizedPath, audiofile, duration, resizedImages, logoFile, wavevizcolor, wavevizmode, outPath, callback)
       }
       TASKS.push(task)
 
@@ -139,7 +139,7 @@ module.exports = {
     });
   },
 
-  combineFinalSlideShow: (orderPath, resizedPath, audiofile, duration, imageFiles, logofile, waveviz, outPath, callback) => {
+  combineFinalSlideShow: (orderPath, resizedPath, audiofile, duration, imageFiles, logofile, wavevizcolor, wavevizmode, outPath, callback) => {
     console.log('combineFinalSlideshow')
     const slidelist = `${resizedPath}/${C.slidelistTxt}`
     const slideshow = `${resizedPath}/${C.slideshowFilename}.mp4`
@@ -150,9 +150,8 @@ module.exports = {
     ffCmd.addInput(logoPath)
     ffCmd.addInput(audioPath)
 
-    if(waveviz){
-      waveviz = waveviz.split(',')
-      ffCmd.complexFilter(`[2:a]showwaves=s=960x540:mode=${waveviz[1]}:colors=${waveviz[0]}[wv];[0:v][1:v]overlay=0:0[v1]; [wv][v1]overlay=0:0[vf]`)
+    if(wavevizcolor){
+      ffCmd.complexFilter(`[2:a]showwaves=s=960x540:mode=${wavevizmode}:colors=${wavevizcolor}[wv];[0:v][1:v]overlay=0:0[v1]; [wv][v1]overlay=0:0[vf]`)
     }else{
       ffCmd.complexFilter('[0:v][1:v]overlay=0:0[vf]')
     }
@@ -185,7 +184,7 @@ module.exports = {
     ffCmd.save(outPath);
   },
 
-  createStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, waveviz, outPath) => {
+  createStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath) => {
     console.log('createStaticShow')
     const logoPath = `${orderPath}/${logoFile}`
     const staticPath = `${orderPath}/${staticFile}`
@@ -195,7 +194,7 @@ module.exports = {
         module.exports.resizeImage(staticPath, outPath, callback)
       },
       function(callback) {
-        module.exports.finalizeStaticShow(orderPath, resizedPath, audiofile, logoFile, C.staticFilename, waveviz, outPath, callback)
+        module.exports.finalizeStaticShow(orderPath, resizedPath, audiofile, logoFile, C.staticFilename, wavevizcolor, wavevizmode, outPath, callback)
       }
     ],
     function(err, results) {
@@ -203,7 +202,7 @@ module.exports = {
     });
   },
 
-  finalizeStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, waveviz, outPath, callback) => {
+  finalizeStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath, callback) => {
     const logoPath = `${orderPath}/${logoFile}`
     const staticResizedPath = `${resizedPath}/${C.staticFilename}`
     const audioPath = `${orderPath}/${audiofile}`
@@ -214,9 +213,8 @@ module.exports = {
     ffCmd.addInput(`${staticResizedPath}`).loop()
     ffCmd.addInput(audioPath)
 
-    if(waveviz){
-      waveviz = waveviz.split(',')
-      ffCmd.complexFilter(`[2:a]showwaves=s=960x540:mode=${waveviz[1]}:colors=${waveviz[0]}[wv];[0:v][1:v]overlay=0:0[v1]; [wv][v1]overlay=0:0[vf]`)
+    if(wavevizcolor){
+      ffCmd.complexFilter(`[2:a]showwaves=s=960x540:mode=${wavevizmode}:colors=${wavevizcolor}[wv];[0:v][1:v]overlay=0:0[v1]; [wv][v1]overlay=0:0[vf]`)
     }else{
       ffCmd.complexFilter('[0:v][1:v]overlay=0:0[vf]')
     }

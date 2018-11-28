@@ -13,7 +13,8 @@ module.exports = async (args) => {
     const runtime = moment().format('YYYYMMDDHHmmss');
     const orderid = args.orderid || args.o
     const audiofile = args.audiofile || args.a
-    const waveviz = args.waveviz || args.w || false
+    const wavevizmode = args.wavevizmode || 'line'
+    const wavevizcolor = args.wavevizcolor || false
     const outname = `${(args.outname || args.o || orderid)}-${runtime}.mp4`
     const outPath = `${conf.get('output_dir')}/${outname}`
     const staticFile = args.static || args.s || false
@@ -28,7 +29,9 @@ module.exports = async (args) => {
     if(!logoFile) error('ERROR: Logo Image Required.', true)
     if(!staticFile) error('ERROR: Static Image Required.', true)
 
-    await ffmpeg.createStaticShow(orderPath, resizedPath, audiofile, logoFile, staticFile, waveviz, outPath)
+    console.log('makeav conf', args)
+
+    await ffmpeg.createStaticShow(orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath)
 
   } catch (err) {
     error(err)

@@ -27,7 +27,7 @@ module.exports = {
       .save(outPath)
   },
 
-  createSlideShow: (orderPath, resizedPath, audiofile, duration, logoFile, waveviz, outPath) => {
+  createSlideShow: (orderPath, resizedPath, audiofile, resize, duration, logoFile, waveviz, outPath) => {
     const logoPath = `${orderPath}/${logoFile}`
     let resizedImages
     try{
@@ -38,6 +38,9 @@ module.exports = {
     promise.then(function(imageFiles){
       async.series([
         function(callback) {
+          if(!resize){
+            return callback(null, true)
+          }
           for(let i in imageFiles){
             if(imageFiles[i] === logoFile) continue
             const id = parseInt(i) + 1

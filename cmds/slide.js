@@ -15,6 +15,7 @@ module.exports = async (args) => {
     const audiofile = args.audiofile || args.a
     const duration = args.duration || args.d || C.durationDefault
     const waveviz = args.waveviz || args.w || false
+    const resize = args.resize || args.r || false
     const logofile = args.logo || args.l || C.logoFilename
     const outname = `${(args.outname || args.o || orderid)}-${runtime}.mp4`
     const outPath = `${conf.get('output_dir')}/${outname}`
@@ -25,7 +26,7 @@ module.exports = async (args) => {
     if(!orderid) error('ERROR: Order Id Required.')
     if(!audiofile) error('ERROR: Audiofile Required.')
 
-    await ffmpeg.createSlideShow(orderPath, resizedPath, audiofile, duration, logofile, waveviz, outPath)
+    await ffmpeg.createSlideShow(orderPath, resizedPath, audiofile, resize, duration, logofile, waveviz, outPath)
 
   } catch (err) {
     error(err)

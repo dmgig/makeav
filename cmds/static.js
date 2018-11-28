@@ -18,7 +18,7 @@ module.exports = async (args) => {
     const outname = `${(args.outname || args.o || orderid)}-${runtime}.mp4`
     const outPath = `${conf.get('outputDirPath')}/${outname}`
     const staticFile = args.static || args.s || false
-    const logoFile = args.logo || args.l || C.logoFilename
+    const logoFile = args.logo || args.l || false
     const workingPath = conf.get('workingDirPath')
     const orderPath = `${workingPath}/${orderid}`
     const resizedPath = `${orderPath}/${C.workFilesDir}`
@@ -26,7 +26,6 @@ module.exports = async (args) => {
 
     if(!orderid) error('ERROR: Order Id Required.', true)
     if(!audiofile) error('ERROR: Audiofile Required.', true)
-    if(!logoFile) error('ERROR: Logo Image Required.', true)
     if(!staticFile) error('ERROR: Static Image Required.', true)
 
     console.log('makeav conf', args)

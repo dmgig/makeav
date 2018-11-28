@@ -194,7 +194,7 @@ module.exports = {
         module.exports.resizeImage(staticPath, outPath, callback)
       },
       function(callback) {
-        module.exports.finalizeStaticShow(orderPath, resizedPath, audiofile, logoFile, C.staticFilename, wavevizcolor, wavevizmode, outPath, callback)
+        module.exports.finalizeStaticShow(orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath, callback)
       }
     ],
     function(err, results) {
@@ -206,22 +206,30 @@ module.exports = {
     const logoPath = `${orderPath}/${logoFile}`
     const staticResizedPath = `${resizedPath}/${C.staticFilename}`
     const audioPath = `${orderPath}/${audiofile}`
+    let   wavevisFilter = ''
 
     const ffCmd = ffmpeg();
 
-    ffCmd.addInput(`${logoPath}`).loop()
-    ffCmd.addInput(`${staticResizedPath}`).loop()
+    if(logoFile){
+      ffCmd.addInput(`${logoPath}`)
+    }
+    ffCmd.addInput(`${staticResizedPath}`)
     ffCmd.addInput(audioPath)
 
-    if(wavevizcolor){
-      ffCmd.complexFilter(`[2:a]showwaves=s=960x540:mode=${wavevizmode}:colors=${wavevizcolor}[wv];[0:v][1:v]overlay=0:0[v1]; [wv][v1]overlay=0:0[vf]`)
+    let audioSpecifier = (logoFile ? '2' : '1');
+
+    if(wavevizcolor)
+      wavevisFilter = `[${audioSpecifier}:a]showwaves=s=960x540:mode=${wavevizmode}:colors=${wavevizcolor}[wv];`
+
+    if(logoFile){
+      ffCmd.complexFilter([wavevisFilter, '[1:v][0:v]overlay=0:0[v1];', '[wv][v1]overlay=0:0[vf]' ].join(''))
     }else{
-      ffCmd.complexFilter('[0:v][1:v]overlay=0:0[vf]')
+      ffCmd.complexFilter([wavevisFilter, '[wv][0:v]overlay=0:0[vf]' ].join(''))
     }
 
     ffCmd.outputOptions(
       '-map', '[vf]',
-      '-map', '2:a',
+      '-map', `${audioSpecifier}:a`,
       '-c:a', 'aac',
       '-b:a', '384k',
       '-profile:a', 'aac_low',

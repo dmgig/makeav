@@ -224,7 +224,7 @@ module.exports = {
 
     if(logoFile){
       ffCmd.addInput(`${logoPath}`)
-      if(animated(fs.readFileSync(l`${logoPath}`))) // check if logo is animated gif
+      if(animated(fs.readFileSync(`${logoPath}`))) // check if logo is animated gif
         ffCmd.inputOptions('-ignore_loop 0')
     }
     ffCmd.addInput(`${staticResizedPath}`)

@@ -43,7 +43,6 @@ module.exports = {
 
       if(resize){
         for(let i in imageFiles){
-          if(imageFiles[i] === logoFile) continue
           task = function(callback){
             const id = parseInt(i) + 1
             const outPath = `${resizedPath}/${C.imgPrefix}-${id.toString().padStart(3, '0')}.png`

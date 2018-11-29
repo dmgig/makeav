@@ -21,6 +21,7 @@
   "author": "Dave M. Giglio",
   "license": "ISC",
   "dependencies": {
+    "animated-gif-detector": "^1.2.0",
     "async": "^2.6.1",
     "configstore": "^4.0.0",
     "ffmpeg": "0.0.4",

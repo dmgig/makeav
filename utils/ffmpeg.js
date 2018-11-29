@@ -6,6 +6,8 @@ const Configstore = require('configstore')
 const conf = new Configstore('makeav')
 const files = require("../utils/files")
 const C = require("../constants")
+const error = require('../utils/error')
+animated = require('animated-gif-detector')
 
 module.exports = {
 
@@ -29,7 +31,7 @@ module.exports = {
 
   createSlideShow: (orderPath, resizedPath, slideshowPath, audiofile, resize, duration, logoFile, wavevizcolor, wavevizmode, outPath) => {
     const logoPath = `${orderPath}/${logoFile}`
-    let resizedImages
+    let resizedImages = []
     try{
       fs.mkdirSync(resizedPath)
     }catch(err){}
@@ -39,17 +41,16 @@ module.exports = {
       const TASKS = [];
       let task;
 
-      for(let i in imageFiles){
-        if(!resize){
-          return callback(null, true)
+      if(resize){
+        for(let i in imageFiles){
+          if(imageFiles[i] === logoFile) continue
+          task = function(callback){
+            const id = parseInt(i) + 1
+            const outPath = `${resizedPath}/${C.imgPrefix}-${id.toString().padStart(3, '0')}.png`
+            module.exports.resizeImage(`${slideshowPath}/${imageFiles[i]}`, outPath, callback)
+          }
+          TASKS.push(task)
         }
-        if(imageFiles[i] === logoFile) continue
-        task = function(callback){
-          const id = parseInt(i) + 1
-          const outPath = `${resizedPath}/${C.imgPrefix}-${id.toString().padStart(3, '0')}.png`
-          module.exports.resizeImage(`${slideshowPath}/${imageFiles[i]}`, outPath, callback)
-        }
-        TASKS.push(task)
       }
 
       task = function(callback) {
@@ -87,6 +88,10 @@ module.exports = {
     console.log('makeSlideshow')
     const slideshow = `${resizedPath}/${C.slideshowFilename}.mp4`
     const ffCmd = ffmpeg();
+
+    if(imageFiles.length === 0)
+      error(`No images in slideshow. Try to use the resize flag: -r=1.`, 1)
+
     imageFiles.forEach((el, i) => {
       ffCmd.addInput(`${resizedPath}/${el}`).loop();
     })
@@ -150,7 +155,11 @@ module.exports = {
     const audioPath = `${orderPath}/${audiofile}`
     const ffCmd = ffmpeg();
     ffCmd.addInput(slidelist).inputOptions(['-f concat'])
+
+
     ffCmd.addInput(logoPath)
+    if(animated(fs.readFileSync(logoPath))) // check if logo is animated gif
+      ffCmd.inputOptions('-ignore_loop 0')
     ffCmd.addInput(audioPath)
 
     if(wavevizcolor){
@@ -215,6 +224,8 @@ module.exports = {
 
     if(logoFile){
       ffCmd.addInput(`${logoPath}`)
+      if(animated(fs.readFileSync(l`${logoPath}`))) // check if logo is animated gif
+        ffCmd.inputOptions('-ignore_loop 0')
     }
     ffCmd.addInput(`${staticResizedPath}`)
     ffCmd.addInput(audioPath)
@@ -231,6 +242,7 @@ module.exports = {
     }
 
     ffCmd.outputOptions(
+      '-ignore_loop', '0',
       '-map', '[vf]',
       '-map', `${audioSpecifier}:a`,
       '-c:a', 'aac',

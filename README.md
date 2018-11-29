@@ -39,10 +39,10 @@ This directory's name is your order id.
 makeav help
 
 #static show
-makeav static -o=test -a=output.wav -l=logo.png -s=e.png
+makeav static -o=test -a=output.wav -l=logo.png -s=e.png -r 1
 
 #slide show
-makeav slide -o=test -a=output.wav -l=logo.png
+makeav slide -o=test -a=output.wav -l=logo.png -r 1
 ```
 
 Videos will appear in the output folder.

@@ -14,6 +14,24 @@ module.exports = {
   resizeImage: (inPath, outPath, callback) => {
     ffmpeg(inPath)
       .videoFilter("format=rgba")
+      .videoFilter('scale=iw*min(960/iw\\,540/ih):ih*min(960/iw\\,540/ih)')
+      .videoFilter("pad=960:540:(960-iw)/2:(480-ih)/2:color=00000000")
+      .on('start', function(commandLine) {
+        console.log('Command: ' + commandLine);
+      })
+      .on('error', function(err) {
+        console.log('Error: ' + err.message);
+      })
+      .on('end', function() {
+        return callback(null, true)
+        console.log('Resizing image finished!');
+      })
+      .save(outPath)
+  },
+
+  resizeImageFullSize: (inPath, outPath, callback) => {
+    ffmpeg(inPath)
+      .videoFilter("format=rgba")
       .videoFilter('scale=iw*min(960/iw\\,480/ih):ih*min(960/iw\\,480/ih)')
       .videoFilter("pad=960:540:(960-iw)/2:(480-ih)/2:color=00000000")
       .on('start', function(commandLine) {

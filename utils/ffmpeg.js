@@ -8,7 +8,7 @@ const conf = new Configstore('makeav')
 const files = require("../utils/files")
 const C = require("../constants")
 const error = require('../utils/error')
-animated = require('animated-gif-detector')
+const animated = require('animated-gif-detector')
 
 module.exports = {
 

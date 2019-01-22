@@ -214,7 +214,7 @@ module.exports = {
   },
 
   createStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath) => {
-    console.log('createStaticShow')
+    console.log('Creating Static Show...')
     const logoPath = `${orderPath}/${logoFile}`
     const staticPath = `${orderPath}/${staticFile}`
     async.series([
@@ -236,6 +236,7 @@ module.exports = {
     const staticResizedPath = `${resizedPath}/${C.staticFilename}`
     const audioPath = `${orderPath}/${audiofile}`
     let   wavevisFilter = ''
+    let   videoMap = ''
 
     const ffCmd = ffmpeg();
 
@@ -244,23 +245,32 @@ module.exports = {
       if(animated(fs.readFileSync(`${logoPath}`))) // check if logo is animated gif
         ffCmd.inputOptions('-ignore_loop 0')
     }
-    ffCmd.addInput(`${staticResizedPath}`)
+    ffCmd.addInput(`${staticResizedPath}`).loop()
     ffCmd.addInput(audioPath)
 
     let audioSpecifier = (logoFile ? '2' : '1');
 
-    if(wavevizcolor)
-      wavevisFilter = `[${audioSpecifier}:a]showwaves=s=960x540:mode=${wavevizmode}:colors=${wavevizcolor}[wv];`
-
     if(logoFile){
-      ffCmd.complexFilter([wavevisFilter, '[1:v][0:v]overlay=0:0[v1];', '[wv][v1]overlay=0:0[vf]' ].join(''))
+      if(wavevizcolor){
+        wavevisFilter = `[${audioSpecifier}:a]showwaves=s=960x540:mode=${wavevizmode}:colors=${wavevizcolor}[wv];`
+        ffCmd.complexFilter([ wavevisFilter, '[1:v][0:v]overlay=0:0[v1];', '[wv][v1]overlay=0:0[vf]' ].join(''))
+      }else{
+        ffCmd.complexFilter('[0:v][1:v]overlay=0:0[vf]')
+      }
+      videoMap = '[vf]'
     }else{
-      ffCmd.complexFilter([wavevisFilter, '[wv][0:v]overlay=0:0[vf]' ].join(''))
+      if(wavevizcolor){
+        wavevisFilter = `[${audioSpecifier}:a]showwaves=s=960x540:mode=${wavevizmode}:colors=${wavevizcolor}[wv];`
+        ffCmd.complexFilter([ wavevisFilter, '[wv][0:v]overlay=0:0[vf]' ].join(''))
+        videoMap = '[vf]'
+      }else{
+        videoMap = '0:v'
+      }
     }
 
     ffCmd.outputOptions(
       '-ignore_loop', '0',
-      '-map', '[vf]',
+      '-map', videoMap,
       '-map', `${audioSpecifier}:a`,
       '-c:a', 'aac',
       '-b:a', '384k',

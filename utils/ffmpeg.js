@@ -1,5 +1,6 @@
-const ffmpeg = require('fluent-ffmpeg');
-const fs = require('fs');
+const ffmpeg = require('fluent-ffmpeg')
+const im = require('imagemagick')
+const fs = require('fs')
 const async = require("async")
 const path = require("path")
 const Configstore = require('configstore')
@@ -11,28 +12,10 @@ animated = require('animated-gif-detector')
 
 module.exports = {
 
-  resizeImage: (inPath, outPath, callback) => {
+  resizeImage: (inPath, outPath, orderPath, callback) => {
     ffmpeg(inPath)
       .videoFilter("format=rgba")
       .videoFilter('scale=iw*min(960/iw\\,540/ih):ih*min(960/iw\\,540/ih)')
-      .videoFilter("pad=960:540:(960-iw)/2:(480-ih)/2:color=00000000")
-      .on('start', function(commandLine) {
-        console.log('Command: ' + commandLine);
-      })
-      .on('error', function(err) {
-        console.log('Error: ' + err.message);
-      })
-      .on('end', function() {
-        return callback(null, true)
-        console.log('Resizing image finished!');
-      })
-      .save(outPath)
-  },
-
-  resizeImageFullSize: (inPath, outPath, callback) => {
-    ffmpeg(inPath)
-      .videoFilter("format=rgba")
-      .videoFilter('scale=iw*min(960/iw\\,480/ih):ih*min(960/iw\\,480/ih)')
       .videoFilter("pad=960:540:(960-iw)/2:(480-ih)/2:color=00000000")
       .on('start', function(commandLine) {
         console.log('Command: ' + commandLine);
@@ -64,7 +47,7 @@ module.exports = {
           task = function(callback){
             const id = parseInt(i) + 1
             const outPath = `${resizedPath}/${C.imgPrefix}-${id.toString().padStart(3, '0')}.png`
-            module.exports.resizeImage(`${slideshowPath}/${imageFiles[i]}`, outPath, callback)
+            module.exports.resizeImage(`${slideshowPath}/${imageFiles[i]}`, outPath, orderPath, callback)
           }
           TASKS.push(task)
         }
@@ -220,7 +203,7 @@ module.exports = {
     async.series([
       function(callback) {
         const outPath = `${resizedPath}/${C.staticFilename}`
-        module.exports.resizeImage(staticPath, outPath, callback)
+        module.exports.resizeImage(staticPath, outPath, orderPath, callback)
       },
       function(callback) {
         module.exports.finalizeStaticShow(orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath, callback)
@@ -233,10 +216,10 @@ module.exports = {
 
   finalizeStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath, callback) => {
     const logoPath = `${orderPath}/${logoFile}`
-    const staticResizedPath = `${resizedPath}/${C.staticFilename}`
     const audioPath = `${orderPath}/${audiofile}`
-    let   wavevisFilter = ''
-    let   videoMap = ''
+    let staticResizedPath = `${resizedPath}/${C.staticFilename}`
+    let wavevisFilter = ''
+    let videoMap = ''
 
     const ffCmd = ffmpeg();
 
@@ -245,6 +228,7 @@ module.exports = {
       if(animated(fs.readFileSync(`${logoPath}`))) // check if logo is animated gif
         ffCmd.inputOptions('-ignore_loop 0')
     }
+
     ffCmd.addInput(`${staticResizedPath}`).loop()
     ffCmd.addInput(audioPath)
 

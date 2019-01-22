@@ -43,7 +43,7 @@ const menus = {
 `,
 
   static: `
-    makeav slide <options>
+    makeav static <options>
 
     ${topCommon}
     --resize, -r ........ (bool) if set to true, will resize the static image
@@ -51,6 +51,8 @@ const menus = {
                           not a 960x640 png
     --static, -s ........ (string) main image file
     ${lowCommon}
+
+    makeav static -o=order1 -a=audio.wav -logo=logo.png -static=image.png --wavevizcolor=#000000
 `
 }
 

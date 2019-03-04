@@ -28,8 +28,9 @@ module.exports = async (args) => {
     if(!audiofile) error('ERROR: Audiofile Required.', true)
     if(!staticFile) error('ERROR: Static Image Required.', true)
 
-    console.log('makeav conf', args)
-
+    if (!fs.existsSync(resizedPath)){
+      fs.mkdirSync(resizedPath)
+    }
     await ffmpeg.createStaticShow(orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath)
 
   } catch (err) {

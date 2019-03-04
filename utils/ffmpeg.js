@@ -32,6 +32,11 @@ module.exports = {
 
   createSlideShow: (orderPath, resizedPath, slideshowPath, audiofile, resize, duration, logoFile, wavevizcolor, wavevizmode, outPath) => {
     const logoPath = `${orderPath}/${logoFile}`
+
+    if(!fs.existsSync(slideshowPath)){
+      error('No slideshow path set. Slideshow images should be in the following directory: working/{order_id}/slideshow');
+    }
+
     let resizedImages = []
     try{
       fs.mkdirSync(resizedPath)
@@ -155,7 +160,6 @@ module.exports = {
     const audioPath = `${orderPath}/${audiofile}`
     const ffCmd = ffmpeg();
     ffCmd.addInput(slidelist).inputOptions(['-f concat'])
-
 
     ffCmd.addInput(logoPath)
     if(animated(fs.readFileSync(logoPath))) // check if logo is animated gif

@@ -243,7 +243,7 @@ module.exports = {
         wavevisFilter = `[${audioSpecifier}:a]showwaves=s=960x540:mode=${wavevizmode}:colors=${wavevizcolor}[wv];`
         ffCmd.complexFilter([ wavevisFilter, '[1:v][0:v]overlay=0:0[v1];', '[wv][v1]overlay=0:0[vf]' ].join(''))
       }else{
-        ffCmd.complexFilter('[0:v][1:v]overlay=0:0[vf]')
+        ffCmd.complexFilter('[1:v][0:v]overlay=0:0[vf]')
       }
       videoMap = '[vf]'
     }else{

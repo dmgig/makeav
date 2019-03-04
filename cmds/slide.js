@@ -28,8 +28,9 @@ module.exports = async (args) => {
     if(!orderid) error('ERROR: Order Id Required.')
     if(!audiofile) error('ERROR: Audiofile Required.')
 
-    console.log('makeav conf', args)
-
+    if (!fs.existsSync(resizedPath)){
+      fs.mkdirSync(resizedPath)
+    }
     await ffmpeg.createSlideShow(orderPath, resizedPath, slideshowPath, audiofile, resize, duration, logofile, wavevizcolor, wavevizmode, outPath)
 
   } catch (err) {

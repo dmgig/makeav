@@ -3,7 +3,7 @@ const topCommon = `--orderid, -o ....... (string) order id, directory name [requ
     --logo, -l .......... (string) logo image file`
 
 const lowCommon = `--wavevizcolor ...... (web color) wave visual, if false, wave will not appear
-    --wavevizmode ....... (lin|log|sqrt|cbrt) wave visual mode, defaults to 'lin'
+    --wavevizmode ....... (point|line|p2p|line) wave visual mode, defaults to 'point'
     --outname, -o ....... (string) output name, defaults to orderid-date`
 
 const menus = {
@@ -40,6 +40,8 @@ const menus = {
                           they are not all 960x640 pngs
     --duration, -d ...... (int) slide duration, defaults to 8
     ${lowCommon}
+
+    makeav slide -o=levine -a=output.wav -l=img.png -d=10 --wavevizcolor=#FFFFFF --wavevizmode=point -r=1
 `,
 
   static: `
@@ -52,7 +54,7 @@ const menus = {
     --static, -s ........ (string) main image file
     ${lowCommon}
 
-    makeav static -o=order1 -a=audio.wav -logo=logo.png -static=image.png --wavevizcolor=#000000
+    makeav static -o=order1 -a=audio.wav -logo=logo.png -static=image.png --wavevizmode=point --wavevizcolor=#FFFFFF
 `
 }
 

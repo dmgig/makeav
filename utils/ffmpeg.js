@@ -18,7 +18,8 @@ module.exports = {
       .videoFilter('scale=iw*min(960/iw\\,540/ih):ih*min(960/iw\\,540/ih)')
       .videoFilter("pad=960:540:(960-iw)/2:(480-ih)/2:color=00000000")
       .on('start', function(commandLine) {
-        console.log('Command: ' + commandLine);
+        // console.log('Command: ' + commandLine);
+        console.log(`Starting 'resizeImage'...`);
       })
       .on('error', function(err) {
         console.log('Error: ' + err.message);
@@ -46,6 +47,12 @@ module.exports = {
     promise.then(function(imageFiles){
       const TASKS = [];
       let task;
+
+      // add logo
+      task = function(callback){
+        module.exports.resizeImage(`${orderPath}/${logoFile}`, `${orderPath}/resized-${logoFile}`, orderPath, callback)
+      }
+      TASKS.push(task)
 
       if(resize){
         for(let i in imageFiles){
@@ -121,7 +128,8 @@ module.exports = {
 
     // finalize
     ffCmd.on('start', function(commandLine) {
-      console.log('Command: ' + commandLine);
+      // console.log('Command: ' + commandLine);
+      console.log(`Starting 'makeSlideshow'...`);
     })
     .on('progress', function(progress) {
       console.log(`Sildeshow: ${progress.timemark}`);
@@ -156,7 +164,7 @@ module.exports = {
     console.log('combineFinalSlideshow')
     const slidelist = `${resizedPath}/${C.slidelistTxt}`
     const slideshow = `${resizedPath}/${C.slideshowFilename}.mp4`
-    const logoPath = `${orderPath}/${logofile}`
+    const logoPath = `${orderPath}/resized-${logofile}`
     const audioPath = `${orderPath}/${audiofile}`
     const ffCmd = ffmpeg();
     ffCmd.addInput(slidelist).inputOptions(['-f concat'])
@@ -185,10 +193,13 @@ module.exports = {
 
     // finalize
     ffCmd.on('start', function(commandLine) {
-      console.log('Command: ' + commandLine);
+      // console.log('Command: ' + commandLine);
+      console.log(`Starting 'combineFinalSlideShow'...`);
     })
     .on('progress', function(progress) {
-      console.log(`Video: ${progress.timemark}`);
+      process.stdout.clearLine();
+      process.stdout.cursorTo(0);
+      process.stdout.write(`Progress: ${progress.timemark}`);
     })
     .on('error', function(err) {
       console.log('Error: ' + err.message);
@@ -202,9 +213,12 @@ module.exports = {
 
   createStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath) => {
     console.log('Creating Static Show...')
-    const logoPath = `${orderPath}/${logoFile}`
+    const logoPath = `${orderPath}/resized-${logoFile}`
     const staticPath = `${orderPath}/${staticFile}`
     async.series([
+      function(callback){
+        module.exports.resizeImage(`${orderPath}/${logoFile}`, `${orderPath}/resized-${logoFile}`, orderPath, callback)
+      },
       function(callback) {
         const outPath = `${resizedPath}/${C.staticFilename}`
         module.exports.resizeImage(staticPath, outPath, orderPath, callback)
@@ -219,7 +233,7 @@ module.exports = {
   },
 
   finalizeStaticShow: (orderPath, resizedPath, audiofile, logoFile, staticFile, wavevizcolor, wavevizmode, outPath, callback) => {
-    const logoPath = `${orderPath}/${logoFile}`
+    const logoPath = `${orderPath}/resized-${logoFile}`
     const audioPath = `${orderPath}/${audiofile}`
     let staticResizedPath = `${resizedPath}/${C.staticFilename}`
     let wavevisFilter = ''
@@ -271,10 +285,13 @@ module.exports = {
 
     // finalize
     ffCmd.on('start', function(commandLine) {
-      console.log('Command: ' + commandLine);
+      // console.log('Command: ' + commandLine);
+      console.log(`Starting 'finalizeStaticShow'...`);
     })
     .on('progress', function(progress) {
-      console.log(`Video: ${progress.timemark}`);
+      process.stdout.clearLine();
+      process.stdout.cursorTo(0);
+      process.stdout.write(`Progress: ${progress.timemark}`);
     })
     .on('error', function(err) {
       console.log('Error: ' + err.message);
